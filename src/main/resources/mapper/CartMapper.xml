@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.vpomo.shedule.mapper.CartMapper">
+    <resultMap id="BaseResultMap" type="com.vpomo.shedule.model.Cart">
+        <result column="cart_id" property="cartId" jdbcType="VARCHAR" />
+        <result column="member_id" property="memberId" jdbcType="VARCHAR" />
+        <result column="store_id" property="storeId" jdbcType="VARCHAR" />
+        <result column="store_name" property="storeName" jdbcType="VARCHAR" />
+        <result column="goods_id" property="goodsId" jdbcType="VARCHAR" />
+        <result column="goods_name" property="goodsName" jdbcType="VARCHAR" />
+        <result column="goods_store_price" property="goodsPrice" jdbcType="DOUBLE" />
+        <result column="goods_num" property="goodsNum" jdbcType="INTEGER" />
+        <result column="goods_images" property="goodsImages" jdbcType="VARCHAR" />
+        <result column="spec_id" property="specId" jdbcType="VARCHAR" />
+        <result column="spec_info" property="specInfo" jdbcType="VARCHAR" />
+    	<result column="first_gc_id" property="firstGcId" jdbcType="VARCHAR"/>
+    	<result column="goods_now_storage" property="goodsNowStorage" jdbcType="INTEGER"/>
+        <result column="goods_state" property="goodsState" jdbcType="INTEGER"/>
+        <result column="gc_id" property="gcId" jdbcType="VARCHAR"/>
+        <result column="brand_id" property="brandId" jdbcType="VARCHAR"/>
+        <result column="type_id" property="typeId" jdbcType="VARCHAR"/>
+    </resultMap>
+    
+    <sql id="Base_Column_List">
+      	cart_id,member_id,store_id,store_name,goods_id,goods_name,goods_store_price,goods_num,
+      	goods_images,spec_id,spec_info,first_gc_id
+    </sql>
+
+    <sql id="activity_Column_List">
+        c.cart_id,c.member_id,c.store_id,c.store_name,c.goods_id,c.goods_name,c.goods_store_price,c.goods_num,
+        c.goods_images,c.spec_id,c.spec_info,c.first_gc_id,g.gc_id,g.brand_id,g.type_id
+    </sql>
+    
+
+    <!-- 保存购物车 -->
+    <insert id="saveCart" parameterType="com.vpomo.shedule.model.Cart" keyProperty="cartId">
+		INSERT INTO shop_cart
+		( cart_id,member_id,store_id,store_name,goods_id,goods_name,goods_store_price,goods_num,
+      	goods_images,spec_id,spec_info,first_gc_id,goods_state)
+		VALUES
+		(#{cartId},#{memberId},#{storeId},#{storeName},#{goodsId},#{goodsName},#{goodsPrice},
+		#{goodsNum},#{goodsImages},#{specId},#{specInfo},#{firstGcId},#{goodsState})
+	</insert>
+
+    <!-- 批量保存购物车 -->
+    <insert id="saveCarts" parameterType="java.util.List" >
+        INSERT INTO shop_cart
+        ( cart_id,member_id,store_id,store_name,goods_id,goods_name,goods_store_price,goods_num,
+        goods_images,spec_id,spec_info,first_gc_id)
+        VALUES
+        <foreach collection="list" item="item" index="index" separator="," >
+            (#{item.cartId},#{item.memberId},#{item.storeId},#{item.storeName},#{item.goodsId},#{item.goodsName},#{item.goodsPrice},
+            #{item.goodsNum},#{item.goodsImages},#{item.specId},#{item.specInfo},#{item.firstGcId})
+        </foreach>
+    </insert>
+	
+	<!-- 修改购物车 -->
+    <select id="updateCart" parameterType="com.vpomo.shedule.model.Cart">
+		update shop_cart
+		set 
+		 	member_id = #{memberId,jdbcType=VARCHAR},
+	       	store_id = #{storeId,jdbcType=VARCHAR},
+	       	store_name =  #{storeName,jdbcType=VARCHAR},
+	       	goods_id =  #{goodsId,jdbcType=VARCHAR},
+	       	goods_name =  #{goodsName,jdbcType=VARCHAR},
+	       	goods_store_price =  #{goodsPrice,jdbcType=DOUBLE},
+	       	goods_num =  #{goodsNum,jdbcType=INTEGER},
+	       	goods_images =  #{goodsImages,jdbcType=VARCHAR},
+	       	spec_id = #{specId,jdbcType=VARCHAR},
+	       	spec_info = #{specInfo,jdbcType=VARCHAR},
+	       	first_gc_id = #{firstGcId,jdbcType=VARCHAR}
+	     where cart_id = #{cartId,jdbcType=VARCHAR}
+	</select>
+    
+    <!-- 删除购物车 -->
+    <delete id="deleteCart" parameterType="java.lang.String">
+    	delete from shop_cart
+    	where cart_id = #{cartId,jdbcType=VARCHAR}
+    </delete>
+
+    <!-- 根据用户id,商品id,商品规格id删除购物车 -->
+    <delete id="deleteByMGS">
+    	delete from shop_cart 
+    	where member_id = #{0}
+    		and goods_id = #{1}
+    		and spec_id = #{2}
+    </delete>
+    
+    <!-- 清空购物车 -->
+    <delete id="deleteAllCartByMemberId" parameterType="java.lang.String">
+    	delete from shop_cart where member_id = #{memberId}
+    </delete>
+ 
+    <!-- 修改购物车数量 -->
+    <select id="updateCartNum" parameterType="com.vpomo.shedule.model.Cart">
+		update shop_cart 
+		set 
+			goods_num =  #{goodsNum,jdbcType=INTEGER}
+	     where cart_id = #{cartId,jdbcType=VARCHAR}
+	</select>
+    
+    <!-- 购物车下单  根据用户id和cartids 查询商品 根据店铺id,和商品一级分类id排序-->
+    <select id="queryByCartIds" resultMap="BaseResultMap" parameterType="com.vpomo.shedule.model.Cart">
+        select
+        <include refid="activity_Column_List" />
+        from shop_cart  c INNER  join shop_goods g on c.goods_id=g.goods_id where member_id=#{memberId}
+        <if test="cartIds != null">
+			and cart_id in (${cartIds})  
+		</if>
+        <if test="storeId != null and  storeId !=''">
+            and c.store_id = #{storeId}
+        </if>
+		order by store_id,first_gc_id
+    </select>
+    
+    <!-- 根据cartid 查询商品 -->
+    <select id="queryCartById" resultMap="BaseResultMap" parameterType="java.lang.String">
+    	select
+        <include refid="Base_Column_List" />
+        from shop_cart where cart_id=#{cartId}
+    </select>
+    
+    <!-- 根据用户id和店铺id查询购物车 -->
+    <select id="queryCartByStoreId" resultMap="BaseResultMap">
+    	select
+        <include refid="Base_Column_List" />
+        from shop_cart where member_id = #{0}
+        and store_id = #{1}
+    </select>
+    
+    <!-- 查询用户购物车数量 -->
+    <select id="queryCountByMemberId" parameterType="java.lang.String" resultType="Integer">
+    	select sum(goods_num) from shop_cart where member_id = #{memberId} AND goods_state=0
+    </select>
+    
+</mapper>

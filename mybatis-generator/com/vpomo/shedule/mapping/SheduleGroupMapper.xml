@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.vpomo.shedule.mapper.SheduleGroupMapper" >
+  <resultMap id="BaseResultMap" type="com.vpomo.shedule.model.SheduleGroup" >
+    <id column="id_group" property="id_group" jdbcType="INTEGER" />
+    <result column="faculty_id" property="faculty_id" jdbcType="INTEGER" />
+    <result column="name_group" property="name_group" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Example_Where_Clause" >
+    <where >
+      <foreach collection="oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause" >
+    <where >
+      <foreach collection="example.oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List" >
+    id_group, faculty_id, name_group
+  </sql>
+  <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.vpomo.shedule.model.SheduleGroupExample" >
+    select
+    <if test="distinct" >
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from shedule_group
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null" >
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from shedule_group
+    where id_group = #{id_group,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from shedule_group
+    where id_group = #{id_group,jdbcType=INTEGER}
+  </delete>
+  <delete id="deleteByExample" parameterType="com.vpomo.shedule.model.SheduleGroupExample" >
+    delete from shedule_group
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.vpomo.shedule.model.SheduleGroup" >
+    insert into shedule_group (id_group, faculty_id, name_group
+      )
+    values (#{id_group,jdbcType=INTEGER}, #{faculty_id,jdbcType=INTEGER}, #{name_group,jdbcType=VARCHAR}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.vpomo.shedule.model.SheduleGroup" >
+    insert into shedule_group
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id_group != null" >
+        id_group,
+      </if>
+      <if test="faculty_id != null" >
+        faculty_id,
+      </if>
+      <if test="name_group != null" >
+        name_group,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id_group != null" >
+        #{id_group,jdbcType=INTEGER},
+      </if>
+      <if test="faculty_id != null" >
+        #{faculty_id,jdbcType=INTEGER},
+      </if>
+      <if test="name_group != null" >
+        #{name_group,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.vpomo.shedule.model.SheduleGroupExample" resultType="java.lang.Integer" >
+    select count(*) from shedule_group
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByExampleSelective" parameterType="map" >
+    update shedule_group
+    <set >
+      <if test="record.id_group != null" >
+        id_group = #{record.id_group,jdbcType=INTEGER},
+      </if>
+      <if test="record.faculty_id != null" >
+        faculty_id = #{record.faculty_id,jdbcType=INTEGER},
+      </if>
+      <if test="record.name_group != null" >
+        name_group = #{record.name_group,jdbcType=VARCHAR},
+      </if>
+    </set>
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map" >
+    update shedule_group
+    set id_group = #{record.id_group,jdbcType=INTEGER},
+      faculty_id = #{record.faculty_id,jdbcType=INTEGER},
+      name_group = #{record.name_group,jdbcType=VARCHAR}
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByPrimaryKeySelective" parameterType="com.vpomo.shedule.model.SheduleGroup" >
+    update shedule_group
+    <set >
+      <if test="faculty_id != null" >
+        faculty_id = #{faculty_id,jdbcType=INTEGER},
+      </if>
+      <if test="name_group != null" >
+        name_group = #{name_group,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id_group = #{id_group,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.vpomo.shedule.model.SheduleGroup" >
+    update shedule_group
+    set faculty_id = #{faculty_id,jdbcType=INTEGER},
+      name_group = #{name_group,jdbcType=VARCHAR}
+    where id_group = #{id_group,jdbcType=INTEGER}
+  </update>
+</mapper>
